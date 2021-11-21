@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 /*
@@ -67,10 +69,15 @@ public class Main {
         p.ask_piece();
     }
 
-    private String parseServerResponse(int posit){
-        String[] tempArr= this.response.split(",");
-        return tempArr[posit];
-
+    private String parseServerResponse(String key){
+        Map<String, String> map = new HashMap<>();
+        String[] pairs= this.response.split(",");
+        for(int i =0; i<pairs.length;i++){
+            String pair = pairs[i];
+            String[] keyVal = pair.split(":");
+            map.put(keyVal[0],keyVal[1]);
+        }
+        return map.get(key);
     }
 
     public static void main(String[] args) {
@@ -84,9 +91,12 @@ public class Main {
             client.data_out.writeUTF(thisPlayer.color);
             //after we connect here we need to print the board
             client.response = client.in_server.readUTF();
-            thisPlayer.setBoard(client.parseServerResponse(0));
+            //parse the servers response for the board, always at position 0
+            thisPlayer.setBoard(client.parseServerResponse("board"));
+            //assign the board to this player
             System.out.println(thisPlayer.getBoard());
-            thisPlayer.setColor(client.parseServerResponse(2));
+            //parse the servers response for the color, rethink ways to find this. right now position 2
+            thisPlayer.setColor(client.parseServerResponse("color"));
             System.out.println("The players color is: " + thisPlayer.getColor());
             client.sock.close();
         }catch (Exception ex){
