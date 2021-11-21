@@ -26,6 +26,54 @@ public class Player {
         this.color = String.valueOf("color set" + "," + player_scanner.nextLine());
     }
 
+    public boolean isTurn() {
+        return turn;
+    }
+
+    public void setTurn(boolean turn) {
+        this.turn = turn;
+    }
+
+    public String getServer_response() {
+        return server_response;
+    }
+
+    public void setServer_response(String server_response) {
+        this.server_response = server_response;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getX_input() {
+        return x_input;
+    }
+
+    public void setX_input(String x_input) {
+        this.x_input = x_input;
+    }
+
+    public String getY_input() {
+        return y_input;
+    }
+
+    public void setY_input(String y_input) {
+        this.y_input = y_input;
+    }
+
+    public String getPiece_input() {
+        return piece_input;
+    }
+
+    public void setPiece_input(String piece_input) {
+        this.piece_input = piece_input;
+    }
+
     public void ask_x(){
         System.out.print("Please enter an X coordinate: ");
         this.x_input = String.valueOf(player_scanner.nextLine());
