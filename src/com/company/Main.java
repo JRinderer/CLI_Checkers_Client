@@ -55,6 +55,8 @@ public class Main {
         Main client = new Main("127.0.0.1",4269);
         //after we connect here we need to print the board
         try {
+            //first send the color
+            client.data_out.writeUTF(thisPlayer.color);
             client.response = client.in_server.readUTF();
             System.out.println(client.response);
         }catch (Exception ex){
