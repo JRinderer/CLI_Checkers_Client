@@ -80,9 +80,21 @@ public class Main {
         return map.get(key);
     }
 
+    public static void askForMove(Player thisPlayer, Main client){
+        thisPlayer.ask_piece();
+        thisPlayer.ask_x();
+        thisPlayer.ask_y();
+        thisPlayer.setPlayer_send_message(thisPlayer.getPiece_input() + "," + thisPlayer.getX_input() + "," + thisPlayer.getY_input() + ",color:" + thisPlayer.getColor());
+        try {
+
+        }catch (Exception ex){
+            System.out.println("error dicks");
+        }
+    }
+
     public static void main(String[] args) {
         Player thisPlayer = new Player();
-
+        String bs_message = "";
         //first set the color we're going to play as
         setColor(thisPlayer);
         Main client = new Main("127.0.0.1",4269);
@@ -101,6 +113,41 @@ public class Main {
             client.sock.close();
         }catch (Exception ex){
             System.out.println("error occured trying to read board or send color");
+        }
+        while(true){
+            try {
+                client = new Main("127.0.0.1", 4269);
+                //retrieve what player is up next;
+                client.data_out.writeUTF("type:get_turn");
+                client.response = client.in_server.readUTF();
+                //client.data_out.writeUTF("type:get_turn2");
+                System.out.println(client.response);
+                //how best to handle checking for turn?
+                if((client.parseServerResponse("player_turn")).equals(thisPlayer.color)){
+                    client.sock.close();
+                    client = new Main("127.0.0.1", 4269);
+                    thisPlayer.ask_piece();
+                    thisPlayer.ask_x();
+                    thisPlayer.ask_y();
+                    thisPlayer.setPlayer_send_message(thisPlayer.getPiece_input() + "," + thisPlayer.getX_input() + "," + thisPlayer.getY_input() + ",color:" + thisPlayer.getColor());
+                    bs_message = thisPlayer.player_send_message;
+                    try {
+                        client.data_out.writeUTF(bs_message);
+                        client.response = client.in_server.readUTF();
+                    }catch (Exception ex){
+                        System.out.println("bull shit");
+                    }
+                    thisPlayer.setBoard(client.parseServerResponse("board"));
+                    System.out.println(thisPlayer.getBoard());
+                }else {
+                    client.data_out.writeUTF("type:return_board");
+                    client.response = client.in_server.readUTF();
+                    thisPlayer.setBoard(client.parseServerResponse("board"));
+                    System.out.println(thisPlayer.getBoard());
+                }
+            }catch (Exception ex){
+                System.out.println(ex);
+            }
         }
 
     }
