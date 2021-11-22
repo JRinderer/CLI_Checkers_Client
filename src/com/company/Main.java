@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 /*
 Server Response will be a string delimited by Comma
@@ -97,6 +98,7 @@ public class Main {
         String bs_message = "";
         //first set the color we're going to play as
         setColor(thisPlayer);
+        String current_board = "";
         Main client = new Main("127.0.0.1",4269);
         try {
             //first send the color
@@ -121,7 +123,9 @@ public class Main {
                 client.data_out.writeUTF("type:get_turn");
                 client.response = client.in_server.readUTF();
                 //client.data_out.writeUTF("type:get_turn2");
-                System.out.println(client.response);
+                //System.out.println(client.response);
+                System.out.println("Player " + client.parseServerResponse("player_turn") + " is up");
+                System.out.println(client.parseServerResponse("board"));
                 //how best to handle checking for turn?
                 if((client.parseServerResponse("player_turn")).equals(thisPlayer.color)){
                     client.sock.close();
@@ -140,13 +144,24 @@ public class Main {
                     thisPlayer.setBoard(client.parseServerResponse("board"));
                     System.out.println(thisPlayer.getBoard());
                 }else {
+                    client.sock.close();
+                    client = new Main("127.0.0.1", 4269);
                     client.data_out.writeUTF("type:return_board");
                     client.response = client.in_server.readUTF();
                     thisPlayer.setBoard(client.parseServerResponse("board"));
-                    System.out.println(thisPlayer.getBoard());
+                    if(thisPlayer.getBoard().equals(current_board)) {
+                        System.out.println(thisPlayer.getBoard());
+                        System.out.println("Waiting on opponets move");
+
+                    }
                 }
             }catch (Exception ex){
                 System.out.println(ex);
+            }
+            try {
+                TimeUnit.SECONDS.sleep(10);
+            }catch (Exception ex){
+                System.out.println("error in sleep");
             }
         }
 
